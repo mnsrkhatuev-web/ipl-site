@@ -501,6 +501,30 @@ async function loadFireSystemsTests() {
     }
 }
 
+function initMobileNav() {
+    const toggle = document.querySelector(".nav-toggle");
+    const menu = document.querySelector(".header-actions");
+
+    if (!toggle || !menu) {
+        return;
+    }
+
+    toggle.addEventListener("click", () => {
+        const isOpen = menu.classList.toggle("is-open");
+        toggle.setAttribute("aria-expanded", String(isOpen));
+        toggle.setAttribute("aria-label", isOpen ? "Закрыть меню" : "Открыть меню");
+    });
+
+    menu.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+            menu.classList.remove("is-open");
+            toggle.setAttribute("aria-expanded", "false");
+            toggle.setAttribute("aria-label", "Открыть меню");
+        });
+    });
+}
+
+initMobileNav();
 initDocumentActions();
 loadDocuments();
 loadNews();
