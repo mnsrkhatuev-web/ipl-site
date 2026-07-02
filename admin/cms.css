@@ -1,7 +1,15 @@
-/* Decap CMS v3 — исправление вёрстки (не SplitPane, а fixed sidebar + padding) */
+/* Decap CMS v3 — стили ИПЛ для desktop и mobile */
 
 :root {
     --ipl-brand: #173b63;
+    --ipl-brand-dark: #0f2741;
+    --ipl-accent: #b88636;
+    --ipl-bg: #f4f1ea;
+    --ipl-surface: #ffffff;
+    --ipl-text: #18202e;
+    --ipl-muted: #5f6775;
+    --ipl-line: rgba(18, 42, 76, 0.12);
+    --ipl-radius: 14px;
     --ipl-header-h: 112px;
     --ipl-sidebar-w: 280px;
 }
@@ -12,18 +20,21 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 body {
     font-family: "Manrope", "Segoe UI", sans-serif;
-    background: #eef1f4;
+    color: var(--ipl-text);
+    background:
+        radial-gradient(circle at top left, rgba(184, 134, 54, 0.12), transparent 28%),
+        linear-gradient(180deg, #faf7f1 0%, #f4f1ea 100%);
     overflow-x: hidden;
 }
 
-/* Корневой контейнер Decap v3: снимаем max-width:1440px и margin:auto */
-body > div,
-#nc-root,
-#nc-root > div {
+/* === Desktop: полноэкранная вёрстка === */
+body > div:first-child {
     width: 100% !important;
     max-width: none !important;
     min-width: 0 !important;
@@ -31,84 +42,141 @@ body > div,
     min-height: 100vh !important;
 }
 
-/* Шапка на всю ширину */
-#nc-root header,
-#nc-root nav,
-body > div header {
+body > div header,
+body > div nav {
     width: 100% !important;
     max-width: none !important;
 }
 
-/* Основная область с отступом под боковую панель */
-#nc-root main,
 body > div main {
     width: 100% !important;
     max-width: none !important;
     min-height: calc(100vh - var(--ipl-header-h)) !important;
-    padding-left: var(--ipl-sidebar-w) !important;
-    padding-right: 24px !important;
-    padding-top: 16px !important;
-    padding-bottom: 24px !important;
+    padding: 20px 32px 32px var(--ipl-sidebar-w) !important;
     box-sizing: border-box !important;
-    background: #eef1f4;
+    background: transparent !important;
 }
 
-/* Боковая панель (fixed, 250px в Decap v3) */
-#nc-root [class*="SidebarContainer"],
 body > div [class*="SidebarContainer"] {
     position: fixed !important;
-    left: 0 !important;
+    left: 24px !important;
     top: var(--ipl-header-h) !important;
     width: 250px !important;
-    max-height: calc(100vh - var(--ipl-header-h)) !important;
+    max-height: calc(100vh - var(--ipl-header-h) - 24px) !important;
+    border-radius: var(--ipl-radius) !important;
+    box-shadow: 0 10px 28px rgba(18, 42, 76, 0.08) !important;
     z-index: 10 !important;
 }
 
-/* Контейнер коллекции */
-#nc-root [class*="CollectionContainer"],
 body > div [class*="CollectionContainer"] {
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
 }
 
-/* Карточки и поля */
-#nc-root input,
-#nc-root textarea,
-#nc-root select,
-#nc-root button {
-    font-family: inherit;
-    font-size: 16px;
+/* Карточки и формы */
+body > div input,
+body > div textarea,
+body > div select,
+body > div button {
+    font-family: inherit !important;
+    font-size: 16px !important;
 }
 
-#nc-root textarea {
-    min-height: 120px;
+body > div textarea {
+    min-height: 140px !important;
+    line-height: 1.55 !important;
 }
 
-/* Кнопки публикации */
-#nc-root button[class*="Primary"],
-#nc-root [class*="PublishButton"] {
+body > div [class*="Card"],
+body > div [class*="ControlPane"] {
+    border-radius: var(--ipl-radius) !important;
+    box-shadow: 0 8px 24px rgba(18, 42, 76, 0.06) !important;
+}
+
+body > div button[class*="Primary"],
+body > div [class*="PublishButton"] {
     background: var(--ipl-brand) !important;
     border-color: var(--ipl-brand) !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
 }
 
+body > div button[class*="Primary"]:hover,
+body > div [class*="PublishButton"]:hover {
+    background: var(--ipl-brand-dark) !important;
+}
+
+body > div [class*="SidebarNavLinkActive"] {
+    background: rgba(23, 59, 99, 0.1) !important;
+    color: var(--ipl-brand) !important;
+    border-radius: 10px !important;
+}
+
+body > div [class*="LoginCard"] {
+    border-radius: 20px !important;
+    box-shadow: 0 18px 45px rgba(18, 42, 76, 0.12) !important;
+}
+
+body > div [class*="LoginButton"] {
+    background: var(--ipl-brand) !important;
+    border-color: var(--ipl-brand) !important;
+    min-height: 48px !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+}
+
+body > div img {
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 10px;
+}
+
+/* === Mobile === */
 @media (max-width: 900px) {
     :root {
+        --ipl-header-h: 88px;
         --ipl-sidebar-w: 0px;
-        --ipl-header-h: 96px;
     }
 
-    #nc-root main,
+    body {
+        overflow-y: auto;
+    }
+
     body > div main {
-        padding-left: 16px !important;
-        padding-right: 16px !important;
+        padding: 12px 16px 80px !important;
+        min-height: auto !important;
     }
 
-    #nc-root [class*="SidebarContainer"],
     body > div [class*="SidebarContainer"] {
         position: static !important;
         width: 100% !important;
+        max-width: none !important;
         max-height: none !important;
-        margin-bottom: 12px !important;
+        left: auto !important;
+        top: auto !important;
+        margin: 0 16px 16px !important;
+    }
+
+    body > div [class*="Toolbar"],
+    body > div [class*="EditorToolbar"] {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+
+    body > div button,
+    body > div [class*="Button"] {
+        min-height: 44px !important;
+    }
+
+    body > div [class*="ListItem"] {
+        padding: 14px !important;
+    }
+}
+
+/* Широкий desktop — контент не растягивается бесконечно */
+@media (min-width: 1400px) {
+    body > div main {
+        padding-right: max(32px, calc((100vw - 1200px) / 2)) !important;
     }
 }
