@@ -1,0 +1,43 @@
+name: Deploy OAuth proxy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "oauth-proxy/**"
+      - ".github/workflows/deploy-oauth.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        working-directory: oauth-proxy
+        run: npm ci
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+          workingDirectory: oauth-proxy
+
+      - name: Set OAuth secrets
+        if: ${{ secrets.GITHUB_OAUTH_ID != '' && secrets.GITHUB_OAUTH_SECRET != '' }}
+        working-directory: oauth-proxy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          echo "${{ secrets.GITHUB_OAUTH_ID }}" | npx wrangler secret put GITHUB_OAUTH_ID
+          echo "${{ secrets.GITHUB_OAUTH_SECRET }}" | npx wrangler secret put GITHUB_OAUTH_SECRET

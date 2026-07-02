@@ -1,19 +1,17 @@
-# Замените YOUR_GITHUB_USERNAME и YOUR_OAUTH_WORKER_URL после настройки (см. SETUP.md)
-
 local_backend: false
 
 backend:
   name: github
-  repo: YOUR_GITHUB_USERNAME/ipl-site
+  repo: mnsrkhatuev-web/ipl-site
   branch: main
-  base_url: https://YOUR_OAUTH_WORKER_URL
+  base_url: https://ipl-decap-oauth.vercel.app
   auth_endpoint: auth
 
 locale: ru
 
-site_url: https://YOUR_GITHUB_USERNAME.github.io/ipl-site
-display_url: https://YOUR_GITHUB_USERNAME.github.io/ipl-site
-logo_url: https://YOUR_GITHUB_USERNAME.github.io/ipl-site/index.html
+site_url: https://mnsrkhatuev-web.github.io/ipl-site
+display_url: https://mnsrkhatuev-web.github.io/ipl-site
+logo_url: https://mnsrkhatuev-web.github.io/ipl-site/index.html
 
 media_folder: assets/images
 public_folder: assets/images
