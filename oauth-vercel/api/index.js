@@ -2,24 +2,19 @@ const TOKEN_URL = "https://github.com/login/oauth/access_token";
 const AUTHORIZE_URL = "https://github.com/login/oauth/authorize";
 const SCOPE = "public_repo,user";
 
-function htmlResponse(html, status = 200) {
-    return new Response(html, {
-        status,
-        headers: {
-            "Content-Type": "text/html; charset=utf-8",
-            "Cache-Control": "no-store"
-        }
-    });
+function sendText(res, status, body) {
+    res.writeHead(status, { "Content-Type": "text/plain; charset=utf-8" });
+    res.end(body);
 }
 
-function redirectResponse(location, status = 302) {
-    return new Response(null, {
-        status,
-        headers: {
-            Location: location,
-            "Cache-Control": "no-store"
-        }
-    });
+function sendHtml(res, status, body) {
+    res.writeHead(status, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(body);
+}
+
+function redirect(res, location) {
+    res.writeHead(302, { Location: location });
+    res.end();
 }
 
 function buildCallbackPage(status, token) {
@@ -72,12 +67,18 @@ async function exchangeCodeForToken(code, redirectUri) {
 }
 
 module.exports = async (req, res) => {
-    const url = new URL(req.url, `https://${req.headers.host}`);
+    const host = req.headers.host || "localhost";
+    const url = new URL(req.url, `https://${host}`);
 
     if (url.pathname === "/auth") {
         const provider = url.searchParams.get("provider");
         if (provider !== "github") {
-            res.status(400).send("Invalid provider");
+            sendText(res, 400, "Invalid provider");
+            return;
+        }
+
+        if (!process.env.GITHUB_OAUTH_ID) {
+            sendText(res, 500, "GITHUB_OAUTH_ID is not configured");
             return;
         }
 
@@ -88,34 +89,33 @@ module.exports = async (req, res) => {
         authUrl.searchParams.set("scope", SCOPE);
         authUrl.searchParams.set("state", crypto.randomUUID());
 
-        res.writeHead(302, { Location: authUrl.toString() });
-        res.end();
+        redirect(res, authUrl.toString());
         return;
     }
 
     if (url.pathname === "/callback") {
         const provider = url.searchParams.get("provider");
         if (provider !== "github") {
-            res.status(400).send("Invalid provider");
+            sendText(res, 400, "Invalid provider");
             return;
         }
 
         const code = url.searchParams.get("code");
         if (!code) {
-            res.status(400).send(buildCallbackPage("error", ""));
+            sendHtml(res, 400, buildCallbackPage("error", ""));
             return;
         }
 
         try {
             const redirectUri = `${url.origin}/callback?provider=github`;
             const token = await exchangeCodeForToken(code, redirectUri);
-            res.status(200).send(buildCallbackPage("success", token));
+            sendHtml(res, 200, buildCallbackPage("success", token));
         } catch (error) {
             console.error(error);
-            res.status(500).send(buildCallbackPage("error", ""));
+            sendHtml(res, 500, buildCallbackPage("error", ""));
         }
         return;
     }
 
-    res.status(200).send("Decap OAuth proxy is running.");
+    sendText(res, 200, "Decap OAuth proxy is running.");
 };

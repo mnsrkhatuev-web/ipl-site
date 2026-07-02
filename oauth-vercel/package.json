@@ -1,4 +1,10 @@
 {
   "name": "ipl-decap-oauth",
-  "private": true
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
 }
