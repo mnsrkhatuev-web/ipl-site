@@ -1,16 +1,9 @@
-/* Админка Decap CMS — полноэкранная вёрстка + стиль ИПЛ */
+/* Decap CMS v3 — исправление вёрстки (не SplitPane, а fixed sidebar + padding) */
 
 :root {
     --ipl-brand: #173b63;
-    --ipl-brand-dark: #0f2741;
-    --ipl-accent: #b88636;
-    --ipl-bg: #f4f1ea;
-    --ipl-surface: #ffffff;
-    --ipl-text: #18202e;
-    --ipl-muted: #5f6775;
-    --ipl-line: rgba(18, 42, 76, 0.12);
-    --ipl-radius: 14px;
-    --ipl-header-h: 52px;
+    --ipl-header-h: 112px;
+    --ipl-sidebar-w: 280px;
 }
 
 html,
@@ -19,231 +12,103 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
 }
 
 body {
     font-family: "Manrope", "Segoe UI", sans-serif;
-    background:
-        radial-gradient(circle at top left, rgba(184, 134, 54, 0.12), transparent 28%),
-        linear-gradient(180deg, #faf7f1 0%, #f4f1ea 100%);
-    color: var(--ipl-text);
-    overflow: hidden;
+    background: #eef1f4;
+    overflow-x: hidden;
 }
 
+/* Корневой контейнер Decap v3: снимаем max-width:1440px и margin:auto */
+body > div,
 #nc-root,
-[class*="AppMainContainer"] {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    min-height: 100vh;
-    height: 100vh;
-}
-
-/* Шапка */
-[class*="AppHeader"] {
-    flex-shrink: 0;
-    height: var(--ipl-header-h);
-    background: rgba(250, 247, 241, 0.96) !important;
-    border-bottom: 1px solid var(--ipl-line) !important;
-    backdrop-filter: blur(12px);
-}
-
-[class*="AppHeaderLink"] {
-    color: var(--ipl-brand) !important;
-    font-weight: 700;
-}
-
-/* react-split-pane — главный контейнер (стабильные классы) */
-.SplitPane {
-    position: relative !important;
-    display: flex !important;
-    flex: 1 1 auto !important;
-    width: 100% !important;
-    height: calc(100vh - var(--ipl-header-h)) !important;
-    min-height: 0 !important;
-    overflow: hidden !important;
-}
-
-.Pane {
-    height: 100% !important;
-    overflow: auto !important;
-    box-sizing: border-box !important;
-}
-
-/* Левая колонка — коллекции */
-.Pane1 {
-    width: 260px !important;
-    min-width: 220px !important;
-    max-width: 300px !important;
-    flex-shrink: 0 !important;
-    background: var(--ipl-surface) !important;
-    border-right: 1px solid var(--ipl-line) !important;
-}
-
-/* Правая колонка — контент */
-.Pane2 {
-    flex: 1 1 auto !important;
-    width: auto !important;
-    min-width: 0 !important;
-    background: transparent !important;
-}
-
-.Resizer {
-    width: 6px !important;
-    background: rgba(23, 59, 99, 0.08) !important;
-    cursor: col-resize;
-}
-
-/* Боковая панель */
-[class*="Sidebar"] {
-    width: 100% !important;
-    height: 100% !important;
-    background: transparent !important;
-}
-
-[class*="SidebarNavLink"] {
-    border-radius: 10px !important;
-    margin: 4px 10px !important;
-    font-weight: 600 !important;
-}
-
-[class*="SidebarNavLinkActive"] {
-    background: rgba(23, 59, 99, 0.1) !important;
-    color: var(--ipl-brand) !important;
-}
-
-/* Основная область — на всю ширину */
-[class*="MainPane"],
-[class*="CollectionMain"],
-[class*="CollectionPage"],
-[class*="CollectionTop"] {
+#nc-root > div {
     width: 100% !important;
     max-width: none !important;
-    height: 100% !important;
-    box-sizing: border-box !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    min-height: 100vh !important;
 }
 
-[class*="CollectionMain"] {
-    padding: 20px 24px !important;
-}
-
-/* Карточка файла / списка */
-[class*="Card"],
-[class*="ControlPane"],
-[class*="EditorControl"],
-[class*="FileControl"] {
+/* Шапка на всю ширину */
+#nc-root header,
+#nc-root nav,
+body > div header {
     width: 100% !important;
-    max-width: 100% !important;
-    border-radius: var(--ipl-radius) !important;
-    border-color: var(--ipl-line) !important;
-    box-shadow: 0 8px 24px rgba(18, 42, 76, 0.06) !important;
+    max-width: none !important;
+}
+
+/* Основная область с отступом под боковую панель */
+#nc-root main,
+body > div main {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: calc(100vh - var(--ipl-header-h)) !important;
+    padding-left: var(--ipl-sidebar-w) !important;
+    padding-right: 24px !important;
+    padding-top: 16px !important;
+    padding-bottom: 24px !important;
     box-sizing: border-box !important;
+    background: #eef1f4;
 }
 
-/* Поля */
-input,
-textarea,
-select {
-    font-family: inherit !important;
-    font-size: 16px !important;
-    border-radius: 10px !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
+/* Боковая панель (fixed, 250px в Decap v3) */
+#nc-root [class*="SidebarContainer"],
+body > div [class*="SidebarContainer"] {
+    position: fixed !important;
+    left: 0 !important;
+    top: var(--ipl-header-h) !important;
+    width: 250px !important;
+    max-height: calc(100vh - var(--ipl-header-h)) !important;
+    z-index: 10 !important;
 }
 
-textarea {
-    min-height: 140px;
-    line-height: 1.55 !important;
+/* Контейнер коллекции */
+#nc-root [class*="CollectionContainer"],
+body > div [class*="CollectionContainer"] {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
 }
 
-/* Кнопки */
-button,
-[class*="Button"] {
-    font-family: inherit !important;
-    border-radius: 10px !important;
-    font-weight: 700 !important;
+/* Карточки и поля */
+#nc-root input,
+#nc-root textarea,
+#nc-root select,
+#nc-root button {
+    font-family: inherit;
+    font-size: 16px;
 }
 
-[class*="Primary"],
-[class*="PublishButton"] {
+#nc-root textarea {
+    min-height: 120px;
+}
+
+/* Кнопки публикации */
+#nc-root button[class*="Primary"],
+#nc-root [class*="PublishButton"] {
     background: var(--ipl-brand) !important;
     border-color: var(--ipl-brand) !important;
-    color: #fff !important;
 }
 
-/* Список */
-[class*="ListItem"] {
-    border-radius: var(--ipl-radius) !important;
-    border: 1px solid var(--ipl-line) !important;
-    margin-bottom: 10px !important;
-}
-
-[class*="ListItemTitle"] {
-    line-height: 1.45 !important;
-    word-break: break-word;
-}
-
-/* Вход */
-[class*="LoginCard"] {
-    border-radius: 20px !important;
-    box-shadow: 0 18px 45px rgba(18, 42, 76, 0.12) !important;
-    border: 1px solid var(--ipl-line) !important;
-    max-width: 420px;
-    margin: 0 auto;
-}
-
-[class*="LoginButton"] {
-    background: var(--ipl-brand) !important;
-    border-color: var(--ipl-brand) !important;
-    width: 100%;
-    min-height: 48px;
-}
-
-img,
-[class*="ImagePreview"] img {
-    max-width: 100% !important;
-    height: auto !important;
-    border-radius: 10px;
-}
-
-/* Мобильная версия */
-@media (max-width: 768px) {
-    body {
-        overflow: auto;
+@media (max-width: 900px) {
+    :root {
+        --ipl-sidebar-w: 0px;
+        --ipl-header-h: 96px;
     }
 
-    #nc-root,
-    [class*="AppMainContainer"] {
-        height: auto;
-        min-height: 100vh;
+    #nc-root main,
+    body > div main {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
     }
 
-    .SplitPane {
-        flex-direction: column !important;
-        height: auto !important;
-        min-height: calc(100vh - var(--ipl-header-h)) !important;
-    }
-
-    .Pane1,
-    .Pane2 {
+    #nc-root [class*="SidebarContainer"],
+    body > div [class*="SidebarContainer"] {
+        position: static !important;
         width: 100% !important;
-        max-width: none !important;
-        height: auto !important;
-        min-height: auto !important;
-    }
-
-    .Pane1 {
-        border-right: none !important;
-        border-bottom: 1px solid var(--ipl-line) !important;
-    }
-
-    .Resizer {
-        display: none !important;
-    }
-
-    [class*="CollectionMain"] {
-        padding: 12px !important;
+        max-height: none !important;
+        margin-bottom: 12px !important;
     }
 }
