@@ -4,7 +4,7 @@ backend:
   name: github
   repo: mnsrkhatuev-web/ipl-site
   branch: main
-  base_url: https://ipl-decap-oauth.vercel.app
+  base_url: https://ipl-decap-oauth.onrender.com
   auth_endpoint: auth
 
 locale: ru

@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: ipl-decap-oauth
+    runtime: node
+    plan: free
+    rootDir: oauth-vercel
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /
+    envVars:
+      - key: GITHUB_OAUTH_ID
+        sync: false
+      - key: GITHUB_OAUTH_SECRET
+        sync: false
