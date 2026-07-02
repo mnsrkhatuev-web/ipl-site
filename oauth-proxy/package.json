@@ -1,0 +1,14 @@
+{
+  "name": "ipl-decap-oauth",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "login": "wrangler login",
+    "deploy": "wrangler deploy",
+    "secret:id": "wrangler secret put GITHUB_OAUTH_ID",
+    "secret:secret": "wrangler secret put GITHUB_OAUTH_SECRET"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

@@ -1,0 +1,55 @@
+# Замените YOUR_GITHUB_USERNAME и YOUR_OAUTH_WORKER_URL после настройки (см. SETUP.md)
+
+local_backend: false
+
+backend:
+  name: github
+  repo: YOUR_GITHUB_USERNAME/ipl-site
+  branch: main
+  base_url: https://YOUR_OAUTH_WORKER_URL
+  auth_endpoint: auth
+
+locale: ru
+
+site_url: https://YOUR_GITHUB_USERNAME.github.io/ipl-site
+display_url: https://YOUR_GITHUB_USERNAME.github.io/ipl-site
+logo_url: https://YOUR_GITHUB_USERNAME.github.io/ipl-site/index.html
+
+media_folder: assets/images
+public_folder: assets/images
+
+collections:
+  - name: news
+    label: Новости
+    files:
+      - label: Список новостей
+        name: news_list
+        file: data/news.json
+        fields:
+          - label: Новости
+            name: items
+            widget: list
+            summary: "{{fields.title}} — {{fields.isoDate}}"
+            fields:
+              - label: Заголовок
+                name: title
+                widget: string
+              - label: Текст
+                name: text
+                widget: text
+              - label: Изображение
+                name: image
+                widget: image
+                required: false
+              - label: Ссылка «Подробнее»
+                name: link
+                widget: string
+                required: false
+                hint: "Внешняя ссылка, например на MAX или Telegram"
+              - label: Дата публикации
+                name: isoDate
+                widget: datetime
+                format: YYYY-MM-DD
+                date_format: YYYY-MM-DD
+                time_format: false
+                default: ""

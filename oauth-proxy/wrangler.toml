@@ -1,0 +1,11 @@
+name = "ipl-decap-oauth"
+main = "worker.js"
+compatibility_date = "2024-04-19"
+
+# После деплоя URL будет вида: https://ipl-decap-oauth.<account>.workers.dev
+# Этот URL нужно вписать в admin/config.yml -> backend.base_url
+
+[vars]
+# Секреты задавайте через wrangler secret put, не храните в файлах:
+# GITHUB_OAUTH_ID
+# GITHUB_OAUTH_SECRET
