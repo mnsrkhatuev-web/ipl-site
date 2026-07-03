@@ -118,12 +118,51 @@ function loginWithGitHub() {
             return;
         }
 
+        let settled = false;
+
+        function cleanup() {
+            window.removeEventListener("message", onMessage);
+            clearInterval(closedCheck);
+            clearTimeout(timeout);
+        }
+
+        function finish(error, token) {
+            if (settled) {
+                return;
+            }
+
+            settled = true;
+            cleanup();
+
+            try {
+                if (!popup.closed) {
+                    popup.close();
+                }
+            } catch (closeError) {
+                // Popup may already be gone on mobile browsers.
+            }
+
+            if (error) {
+                reject(error);
+                return;
+            }
+
+            resolve(token);
+        }
+
         function onMessage(event) {
+            if (event.source !== popup) {
+                return;
+            }
+
             if (typeof event.data !== "string") {
                 return;
             }
 
             if (event.data === "authorizing:github") {
+                popup.postMessage("authorization:github:ready", "*");
+                state.message = "Завершаем вход…";
+                render();
                 return;
             }
 
@@ -131,21 +170,31 @@ function loginWithGitHub() {
             const errorPrefix = "authorization:github:error:";
 
             if (event.data.startsWith(successPrefix)) {
-                window.removeEventListener("message", onMessage);
                 try {
                     const payload = JSON.parse(event.data.slice(successPrefix.length));
-                    resolve(payload.token);
+                    finish(null, payload.token);
                 } catch (error) {
-                    reject(error);
+                    finish(error);
                 }
                 return;
             }
 
             if (event.data.startsWith(errorPrefix)) {
-                window.removeEventListener("message", onMessage);
-                reject(new Error("Не удалось войти через GitHub"));
+                finish(new Error("Не удалось войти через GitHub"));
             }
         }
+
+        const closedCheck = setInterval(() => {
+            if (popup.closed && !settled) {
+                finish(new Error("Вход отменён"));
+            }
+        }, 500);
+
+        const timeout = setTimeout(() => {
+            if (!settled) {
+                finish(new Error("Время ожидания авторизации истекло"));
+            }
+        }, 120000);
 
         window.addEventListener("message", onMessage);
     });
