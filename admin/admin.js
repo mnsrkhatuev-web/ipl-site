@@ -380,11 +380,13 @@ function renderLogin() {
         ${renderHeader()}
         <div class="login-wrap">
             <div class="login-card">
+                <div class="login-badge">ИПЛ</div>
                 <h1>Вход в админку</h1>
                 <p>Для публикации новостей войдите через GitHub. Доступ есть только у редакторов репозитория.</p>
-                <button class="btn btn-primary" type="button" data-action="login" ${state.loading ? "disabled" : ""}>
+                <button class="btn btn-brand btn-icon btn-github" type="button" data-action="login" ${state.loading ? "disabled" : ""}>
                     Войти через GitHub
                 </button>
+                <p class="login-note">Нужны права редактора в репозитории GitHub</p>
             </div>
         </div>
     `;
@@ -418,6 +420,7 @@ function renderNewsList() {
         ${renderHeader()}
         <main class="admin-main">
             <div class="admin-hero">
+                <p class="admin-kicker">Управление контентом</p>
                 <h1>Новости</h1>
                 <p>Добавляйте и редактируйте публикации. Изменения появятся на сайте через 1–3 минуты.</p>
             </div>
@@ -441,7 +444,8 @@ function renderEditor() {
         ${renderHeader()}
         <main class="admin-main">
             <div class="admin-hero">
-                <h1>${state.editingIndex >= 0 ? "Редактирование" : "Новая новость"}</h1>
+                <p class="admin-kicker">${state.editingIndex >= 0 ? "Редактирование" : "Создание"}</p>
+                <h1>${state.editingIndex >= 0 ? "Изменить новость" : "Новая новость"}</h1>
                 <p>Заполните поля и нажмите «Опубликовать».</p>
             </div>
             ${state.message ? `<div class="status-bar">${escapeHtml(state.message)}</div>` : ""}
