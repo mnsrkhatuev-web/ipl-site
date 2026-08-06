@@ -551,6 +551,10 @@ function applyTheme(theme) {
     document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
         button.setAttribute("aria-label", next === "dark" ? "Включить светлую тему" : "Включить тёмную тему");
         button.title = next === "dark" ? "Светлая тема" : "Тёмная тема";
+        const label = button.querySelector(".theme-toggle-label");
+        if (label) {
+            label.textContent = next === "dark" ? "Светлая" : "Тёмная";
+        }
     });
 }
 
@@ -565,11 +569,18 @@ function setTheme(theme) {
 
 function initThemeToggle() {
     applyTheme(getPreferredTheme());
-    document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
-        button.addEventListener("click", () => {
-            const current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
-            setTheme(current === "dark" ? "light" : "dark");
-        });
+    if (window.__iplThemeToggleBound) {
+        return;
+    }
+    window.__iplThemeToggleBound = true;
+    document.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-theme-toggle]");
+        if (!button) {
+            return;
+        }
+        event.preventDefault();
+        const current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+        setTheme(current === "dark" ? "light" : "dark");
     });
 }
 

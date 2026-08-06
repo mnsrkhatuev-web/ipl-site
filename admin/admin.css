@@ -779,25 +779,32 @@ button:disabled {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
-    padding: 0;
+    gap: 8px;
+    min-height: 42px;
+    padding: 0 14px;
     border: 1px solid var(--line);
     border-radius: 12px;
     background: var(--toggle-bg);
     color: var(--brand-strong);
     cursor: pointer;
     flex-shrink: 0;
+    font-weight: 700;
+    font-size: 0.88rem;
 }
 
 .theme-toggle svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     fill: none;
     stroke: currentColor;
     stroke-width: 1.8;
     stroke-linecap: round;
     stroke-linejoin: round;
+    pointer-events: none;
+}
+
+.theme-toggle-label {
+    pointer-events: none;
 }
 
 .theme-toggle .icon-sun {
@@ -810,6 +817,17 @@ html[data-theme="dark"] .theme-toggle .icon-moon {
 
 html[data-theme="dark"] .theme-toggle .icon-sun {
     display: block;
+}
+
+@media (max-width: 760px) {
+    .theme-toggle {
+        width: 44px;
+        padding: 0;
+    }
+
+    .theme-toggle-label {
+        display: none;
+    }
 }
 
 html[data-theme="dark"] .course-devices,
