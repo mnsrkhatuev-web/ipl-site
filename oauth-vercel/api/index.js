@@ -6,7 +6,7 @@ const NEWS_PATH = process.env.NEWS_PATH || "data/news.json";
 const IMAGES_PATH = process.env.IMAGES_PATH || "assets/images";
 const ALLOWED_ORIGINS = (
     process.env.ALLOWED_ORIGINS ||
-    "https://mnsrkhatuev-web.github.io,http://127.0.0.1:8000,http://localhost:8000"
+    "https://ipl-chr.ru,https://www.ipl-chr.ru,https://mnsrkhatuev-web.github.io,http://127.0.0.1:8000,http://localhost:8000"
 ).split(",").map((value) => value.trim()).filter(Boolean);
 const SESSION_TTL_SECONDS = Number(process.env.SESSION_TTL_SECONDS || 60 * 60 * 12);
 

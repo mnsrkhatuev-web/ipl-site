@@ -19,4 +19,4 @@ services:
       - key: GITHUB_REPO
         value: mnsrkhatuev-web/ipl-site
       - key: ALLOWED_ORIGINS
-        value: https://mnsrkhatuev-web.github.io,http://127.0.0.1:8000,http://localhost:8000
+        value: https://ipl-chr.ru,https://www.ipl-chr.ru,https://mnsrkhatuev-web.github.io,http://127.0.0.1:8000,http://localhost:8000

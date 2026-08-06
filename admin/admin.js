@@ -1,6 +1,6 @@
 const CONFIG = {
     apiBase: "https://ipl-decap-oauth.onrender.com",
-    siteUrl: "https://mnsrkhatuev-web.github.io/ipl-site"
+    siteUrl: "https://ipl-chr.ru"
 };
 
 const TOKEN_KEY = "ipl_admin_token";
@@ -96,10 +96,17 @@ async function apiRequest(path, options = {}) {
         headers["Content-Type"] = "application/json";
     }
 
-    const response = await fetch(`${CONFIG.apiBase}${path}`, {
-        ...options,
-        headers
-    });
+    let response;
+    try {
+        response = await fetch(`${CONFIG.apiBase}${path}`, {
+            ...options,
+            headers
+        });
+    } catch (error) {
+        throw new Error(
+            "Не удалось связаться с сервером. Проверьте интернет или подождите 30–60 сек (Render может «просыпаться»)."
+        );
+    }
 
     const data = await response.json().catch(() => ({}));
 

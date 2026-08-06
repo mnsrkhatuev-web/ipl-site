@@ -30,7 +30,7 @@
 | Переменная | Значение |
 |------------|----------|
 | `GITHUB_REPO` | `mnsrkhatuev-web/ipl-site` |
-| `ALLOWED_ORIGINS` | `https://mnsrkhatuev-web.github.io,http://127.0.0.1:8000,http://localhost:8000` |
+| `ALLOWED_ORIGINS` | `https://ipl-chr.ru,https://www.ipl-chr.ru,https://mnsrkhatuev-web.github.io,http://127.0.0.1:8000,http://localhost:8000` |
 
 Старые `GITHUB_OAUTH_ID` / `GITHUB_OAUTH_SECRET` больше не нужны — можно удалить.
 
