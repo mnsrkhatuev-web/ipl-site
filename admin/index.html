@@ -11,7 +11,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="admin.css?v=4">
+    <link rel="stylesheet" href="admin.css?v=5">
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem("ipl-theme");
+                var theme = saved === "dark" || saved === "light"
+                    ? saved
+                    : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+                document.documentElement.setAttribute("data-theme", theme);
+            } catch (e) {}
+        })();
+    </script>
 </head>
 <body class="notranslate">
     <div id="app"></div>
@@ -21,6 +32,6 @@
             history.replaceState(null, "", location.pathname + location.search);
         }
     </script>
-    <script src="admin.js?v=6"></script>
+    <script src="admin.js?v=7"></script>
 </body>
 </html>
