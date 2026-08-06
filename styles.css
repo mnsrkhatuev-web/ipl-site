@@ -221,6 +221,17 @@ img {
         url("assets/images/mchs.png") center/cover no-repeat;
 }
 
+@supports (background-image: image-set(url("assets/images/mchs.webp") type("image/webp"))) {
+    .hero::before {
+        background:
+            linear-gradient(110deg, rgba(15, 39, 65, 0.92) 0%, rgba(23, 59, 99, 0.88) 42%, rgba(23, 59, 99, 0.5) 62%, rgba(23, 59, 99, 0.2) 100%),
+            image-set(
+                url("assets/images/mchs.webp") type("image/webp"),
+                url("assets/images/mchs.png") type("image/png")
+            ) center/cover no-repeat;
+    }
+}
+
 .hero::after {
     content: "";
     position: absolute;
@@ -458,6 +469,17 @@ h3 {
         url("assets/images/lab.png") center/cover no-repeat;
     border-bottom-left-radius: 36px;
     border-bottom-right-radius: 36px;
+}
+
+@supports (background-image: image-set(url("assets/images/lab.webp") type("image/webp"))) {
+    .page-header-image::before {
+        background:
+            linear-gradient(130deg, rgba(15, 39, 65, 0.86), rgba(15, 39, 65, 0.3)),
+            image-set(
+                url("assets/images/lab.webp") type("image/webp"),
+                url("assets/images/lab.png") type("image/png")
+            ) center/cover no-repeat;
+    }
 }
 
 .page-header-image .container {

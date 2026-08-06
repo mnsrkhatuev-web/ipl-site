@@ -402,7 +402,7 @@ async function loadNews() {
             card.className = "card news-card";
 
             const imageMarkup = item.image
-                ? `<img src="${resolvePath(item.image)}" alt="${escapeAttr(item.title)}">`
+                ? `<img src="${resolvePath(item.image)}" alt="${escapeAttr(item.title)}" loading="lazy" decoding="async" width="640" height="360">`
                 : "";
             const linkMarkup = item.link
                 ? `<a class="text-link" href="${escapeAttr(item.link)}" target="_blank" rel="noopener noreferrer">Подробнее</a>`

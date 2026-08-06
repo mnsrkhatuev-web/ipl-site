@@ -17,6 +17,8 @@ const mimeTypes = {
   ".webp": "image/webp",
   ".svg": "image/svg+xml",
   ".ico": "image/x-icon",
+  ".webmanifest": "application/manifest+json",
+  ".woff2": "font/woff2",
   ".pdf": "application/pdf",
   ".doc": "application/msword",
   ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -43,8 +45,16 @@ http
       }
 
       const ext = path.extname(filePath).toLowerCase();
-      const contentType = mimeTypes[ext] || "application/octet-stream";
-      res.writeHead(200, { "Content-Type": contentType });
+      const contentType =
+        ext === ".js" && path.basename(filePath) === "sw.js"
+          ? "application/javascript; charset=utf-8"
+          : mimeTypes[ext] || "application/octet-stream";
+      const headers = { "Content-Type": contentType };
+      if (path.basename(filePath) === "sw.js") {
+        headers["Service-Worker-Allowed"] = "/";
+        headers["Cache-Control"] = "no-cache";
+      }
+      res.writeHead(200, headers);
       res.end(data);
     });
   })
