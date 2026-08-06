@@ -322,6 +322,12 @@ function openEdit(index) {
 }
 
 function renderHeader() {
+    const themeButton = `
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Сменить тему" title="Тема">
+            <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.3A8.2 8.2 0 1 1 9.7 3a6.6 6.6 0 0 0 11.3 11.3z"/></svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>`;
+
     return `
         <header class="admin-header">
             <div class="admin-header-inner">
@@ -332,14 +338,15 @@ function renderHeader() {
                         <span>ФГБУ СЭУ ФПС ИПЛ по ЧР</span>
                     </div>
                 </a>
-                ${
-                    state.token
-                        ? `<div class="admin-header-actions">
-                            <a class="btn btn-ghost" href="course.html">Обучение</a>
-                            <button class="btn btn-ghost" type="button" data-action="logout">Выйти</button>
-                           </div>`
-                        : ""
-                }
+                <div class="admin-header-actions">
+                    ${themeButton}
+                    ${
+                        state.token
+                            ? `<a class="btn btn-ghost" href="course.html">Обучение</a>
+                               <button class="btn btn-ghost" type="button" data-action="logout">Выйти</button>`
+                            : ""
+                    }
+                </div>
             </div>
         </header>
     `;
@@ -467,10 +474,53 @@ function renderEditor() {
 function render() {
     if (!state.token) {
         app.innerHTML = renderLogin();
-        return;
+    } else {
+        app.innerHTML = state.view === "edit" ? renderEditor() : renderNewsList();
     }
+    syncThemeControls();
+}
 
-    app.innerHTML = state.view === "edit" ? renderEditor() : renderNewsList();
+const THEME_STORAGE_KEY = "ipl-theme";
+
+function getPreferredTheme() {
+    try {
+        const saved = localStorage.getItem(THEME_STORAGE_KEY);
+        if (saved === "dark" || saved === "light") {
+            return saved;
+        }
+    } catch (error) {
+        /* ignore */
+    }
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+}
+
+function applyTheme(theme) {
+    const next = theme === "dark" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", next);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+        meta.setAttribute("content", next === "dark" ? "#121820" : "#173b63");
+    }
+    syncThemeControls();
+}
+
+function syncThemeControls() {
+    const next = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+    document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+        button.setAttribute("aria-label", next === "dark" ? "Включить светлую тему" : "Включить тёмную тему");
+        button.title = next === "dark" ? "Светлая тема" : "Тёмная тема";
+    });
+}
+
+function setTheme(theme) {
+    applyTheme(theme);
+    try {
+        localStorage.setItem(THEME_STORAGE_KEY, theme === "dark" ? "dark" : "light");
+    } catch (error) {
+        /* ignore */
+    }
 }
 
 function bindEvents() {
@@ -483,6 +533,13 @@ function bindEvents() {
     });
 
     app.addEventListener("click", (event) => {
+        const themeButton = event.target.closest("[data-theme-toggle]");
+        if (themeButton) {
+            const current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+            setTheme(current === "dark" ? "light" : "dark");
+            return;
+        }
+
         const button = event.target.closest("[data-action]");
         if (!button || state.loading) {
             return;
@@ -547,6 +604,7 @@ function bindEvents() {
 }
 
 async function init() {
+    applyTheme(getPreferredTheme());
     bindEvents();
     render();
 

@@ -525,6 +525,55 @@ function initMobileNav() {
     });
 }
 
+const THEME_STORAGE_KEY = "ipl-theme";
+
+function getPreferredTheme() {
+    try {
+        const saved = localStorage.getItem(THEME_STORAGE_KEY);
+        if (saved === "dark" || saved === "light") {
+            return saved;
+        }
+    } catch (error) {
+        /* ignore */
+    }
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+}
+
+function applyTheme(theme) {
+    const next = theme === "dark" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", next);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+        meta.setAttribute("content", next === "dark" ? "#121820" : "#0f2741");
+    }
+    document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+        button.setAttribute("aria-label", next === "dark" ? "Включить светлую тему" : "Включить тёмную тему");
+        button.title = next === "dark" ? "Светлая тема" : "Тёмная тема";
+    });
+}
+
+function setTheme(theme) {
+    applyTheme(theme);
+    try {
+        localStorage.setItem(THEME_STORAGE_KEY, theme === "dark" ? "dark" : "light");
+    } catch (error) {
+        /* ignore */
+    }
+}
+
+function initThemeToggle() {
+    applyTheme(getPreferredTheme());
+    document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+        button.addEventListener("click", () => {
+            const current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+            setTheme(current === "dark" ? "light" : "dark");
+        });
+    });
+}
+
+initThemeToggle();
 initMobileNav();
 initDocumentActions();
 loadDocuments();

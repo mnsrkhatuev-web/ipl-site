@@ -447,6 +447,7 @@ function createCourseApp(root, course) {
                         ${progress.examPassed ? `<p class="course-badge">Финальный экзамен сдан</p>` : ""}
                         ${renderStatsStrip()}
                         ${renderDayChart()}
+                        ${renderAbbreviations()}
                         <button type="button" class="btn course-reset" data-course-action="reset">Сбросить прогресс</button>
                     </div>
                 </div>
@@ -535,8 +536,68 @@ function createCourseApp(root, course) {
         `;
     }
 
+    function devicesByIds(ids) {
+        const all = Array.isArray(course.devices) ? course.devices : [];
+        if (!Array.isArray(ids) || !ids.length) {
+            return [];
+        }
+        const map = new Map(all.map((device) => [device.id, device]));
+        return ids.map((id) => map.get(id)).filter(Boolean);
+    }
+
+    function renderAbbreviations() {
+        const items = Array.isArray(course.abbreviations) ? course.abbreviations : [];
+        if (!items.length) {
+            return "";
+        }
+        return `
+            <div class="course-abbr-block">
+                <h3>Сокращения</h3>
+                <ul class="course-abbr-list">
+                    ${items
+                        .map(
+                            (item) => `
+                        <li>
+                            <strong>${escapeHtml(item.short)}</strong>
+                            <span>${escapeHtml(item.full)}</span>
+                        </li>`
+                        )
+                        .join("")}
+                </ul>
+            </div>
+        `;
+    }
+
+    function renderDeviceGlossary(devices, title = "Приборы и расшифровки") {
+        if (!devices.length) {
+            return "";
+        }
+        return `
+            <div class="course-devices">
+                <h2>${escapeHtml(title)}</h2>
+                <ul class="course-device-list">
+                    ${devices
+                        .map(
+                            (device) => `
+                        <li class="course-device-item">
+                            <div class="course-device-head">
+                                <strong>${escapeHtml(device.short)}</strong>
+                                <span>${escapeHtml(device.name)}</span>
+                            </div>
+                            <p class="course-device-decipher">${escapeHtml(device.decipher || "")}</p>
+                            <p class="muted">${escapeHtml(device.purpose || "")}</p>
+                        </li>`
+                        )
+                        .join("")}
+                </ul>
+            </div>
+        `;
+    }
+
     function renderModuleIntro(module, index) {
         const best = progress.best[module.id];
+        const moduleDevices = devicesByIds(module.deviceIds);
+        const showAbbr = index === 0 || module.id === "instruments" || module.id === "order";
         return `
             <section class="page-header">
                 <div class="container">
@@ -547,10 +608,12 @@ function createCourseApp(root, course) {
             </section>
             <section class="page-content">
                 <div class="container course-panel">
-                    <h2>Кратко по теме</h2>
+                    <h2>Материал модуля</h2>
                     <ul class="course-theory-list">
-                        ${module.theory.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+                        ${(module.theory || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
                     </ul>
+                    ${renderDeviceGlossary(moduleDevices)}
+                    ${showAbbr ? renderAbbreviations() : ""}
                     ${best ? `<p class="muted">Ваш лучший результат: <strong>${best.percent}%</strong></p>` : ""}
                     <div class="course-actions">
                         <button type="button" class="btn" data-course-action="hub">К списку модулей</button>
