@@ -1,14 +1,15 @@
 {
+  "id": "/",
   "name": "ФГБУ СЭУ ФПС ИПЛ по Чеченской Республике",
   "short_name": "ИПЛ ЧР",
   "description": "Официальный информационный сайт испытательной пожарной лаборатории: направления деятельности, документы, новости и контакты.",
   "lang": "ru",
-  "start_url": "/",
+  "dir": "ltr",
+  "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0f2741",
   "theme_color": "#0f2741",
-  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "/assets/icons/icon-192.png",
@@ -23,7 +24,7 @@
       "purpose": "any"
     },
     {
-      "src": "/assets/icons/icon-512.png",
+      "src": "/assets/icons/icon-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
