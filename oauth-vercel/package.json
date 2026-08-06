@@ -1,5 +1,5 @@
 {
-  "name": "ipl-decap-oauth",
+  "name": "ipl-admin-api",
   "private": true,
   "engines": {
     "node": ">=18"

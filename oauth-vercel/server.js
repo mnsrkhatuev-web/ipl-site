@@ -10,5 +10,5 @@ http.createServer((req, res) => {
         res.end("Internal Server Error");
     });
 }).listen(port, () => {
-    console.log(`OAuth proxy listening on ${port}`);
+    console.log(`IPL admin API listening on ${port}`);
 });

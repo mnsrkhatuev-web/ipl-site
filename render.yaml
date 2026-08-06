@@ -8,7 +8,15 @@ services:
     startCommand: node server.js
     healthCheckPath: /
     envVars:
-      - key: GITHUB_OAUTH_ID
+      - key: ADMIN_USER
         sync: false
-      - key: GITHUB_OAUTH_SECRET
+      - key: ADMIN_PASSWORD
         sync: false
+      - key: SESSION_SECRET
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: GITHUB_REPO
+        value: mnsrkhatuev-web/ipl-site
+      - key: ALLOWED_ORIGINS
+        value: https://mnsrkhatuev-web.github.io,http://127.0.0.1:8000,http://localhost:8000

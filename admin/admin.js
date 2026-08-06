@@ -1,9 +1,5 @@
 const CONFIG = {
-    repo: "mnsrkhatuev-web/ipl-site",
-    branch: "main",
-    newsPath: "data/news.json",
-    imagesPath: "assets/images",
-    oauthBase: "https://ipl-decap-oauth.onrender.com",
+    apiBase: "https://ipl-decap-oauth.onrender.com",
     siteUrl: "https://mnsrkhatuev-web.github.io/ipl-site"
 };
 
@@ -18,7 +14,9 @@ const state = {
     draft: emptyDraft(),
     pendingImage: null,
     loading: false,
-    message: ""
+    message: "",
+    loginUsername: "",
+    loginPassword: ""
 };
 
 const app = document.getElementById("app");
@@ -84,128 +82,61 @@ function setLoading(loading, message = "") {
     render();
 }
 
-async function githubRequest(path, options = {}) {
-    const response = await fetch(`https://api.github.com${path}`, {
+async function apiRequest(path, options = {}) {
+    const headers = {
+        Accept: "application/json",
+        ...(options.headers || {})
+    };
+
+    if (state.token) {
+        headers.Authorization = `Bearer ${state.token}`;
+    }
+
+    if (options.body && !headers["Content-Type"]) {
+        headers["Content-Type"] = "application/json";
+    }
+
+    const response = await fetch(`${CONFIG.apiBase}${path}`, {
         ...options,
-        headers: {
-            Accept: "application/vnd.github+json",
-            Authorization: `Bearer ${state.token}`,
-            "X-GitHub-Api-Version": "2022-11-28",
-            ...(options.headers || {})
-        }
+        headers
     });
 
     const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-        const error = data.message || `Ошибка GitHub API (${response.status})`;
-        throw new Error(error);
+        if (response.status === 401) {
+            state.token = "";
+            sessionStorage.removeItem(TOKEN_KEY);
+        }
+        throw new Error(data.error || `Ошибка сервера (${response.status})`);
     }
 
     return data;
 }
 
-function loginWithGitHub() {
-    return new Promise((resolve, reject) => {
-        const popup = window.open(
-            `${CONFIG.oauthBase}/auth?provider=github`,
-            "github-oauth",
-            "width=560,height=720"
-        );
+async function handleLogin(event) {
+    if (event) {
+        event.preventDefault();
+    }
 
-        if (!popup) {
-            reject(new Error("Разрешите всплывающие окна для входа"));
-            return;
-        }
+    const username = state.loginUsername.trim();
+    const password = state.loginPassword;
 
-        let settled = false;
+    if (!username || !password) {
+        showToast("Введите логин и пароль", true);
+        return;
+    }
 
-        function cleanup() {
-            window.removeEventListener("message", onMessage);
-            clearInterval(closedCheck);
-            clearTimeout(timeout);
-        }
-
-        function finish(error, token) {
-            if (settled) {
-                return;
-            }
-
-            settled = true;
-            cleanup();
-
-            try {
-                if (!popup.closed) {
-                    popup.close();
-                }
-            } catch (closeError) {
-                // Popup may already be gone on mobile browsers.
-            }
-
-            if (error) {
-                reject(error);
-                return;
-            }
-
-            resolve(token);
-        }
-
-        function onMessage(event) {
-            if (event.source !== popup) {
-                return;
-            }
-
-            if (typeof event.data !== "string") {
-                return;
-            }
-
-            if (event.data === "authorizing:github") {
-                popup.postMessage("authorization:github:ready", "*");
-                state.message = "Завершаем вход…";
-                render();
-                return;
-            }
-
-            const successPrefix = "authorization:github:success:";
-            const errorPrefix = "authorization:github:error:";
-
-            if (event.data.startsWith(successPrefix)) {
-                try {
-                    const payload = JSON.parse(event.data.slice(successPrefix.length));
-                    finish(null, payload.token);
-                } catch (error) {
-                    finish(error);
-                }
-                return;
-            }
-
-            if (event.data.startsWith(errorPrefix)) {
-                finish(new Error("Не удалось войти через GitHub"));
-            }
-        }
-
-        const closedCheck = setInterval(() => {
-            if (popup.closed && !settled) {
-                finish(new Error("Вход отменён"));
-            }
-        }, 500);
-
-        const timeout = setTimeout(() => {
-            if (!settled) {
-                finish(new Error("Время ожидания авторизации истекло"));
-            }
-        }, 120000);
-
-        window.addEventListener("message", onMessage);
-    });
-}
-
-async function handleLogin() {
     try {
-        setLoading(true, "Открываем вход через GitHub…");
-        const token = await loginWithGitHub();
-        state.token = token;
-        sessionStorage.setItem(TOKEN_KEY, token);
+        setLoading(true, "Входим…");
+        const data = await apiRequest("/login", {
+            method: "POST",
+            body: JSON.stringify({ username, password })
+        });
+
+        state.token = data.token;
+        sessionStorage.setItem(TOKEN_KEY, data.token);
+        state.loginPassword = "";
         await loadNews();
         showToast("Вход выполнен");
     } catch (error) {
@@ -219,6 +150,7 @@ function handleLogout() {
     sessionStorage.removeItem(TOKEN_KEY);
     state.items = [];
     state.view = "list";
+    state.loginPassword = "";
     render();
 }
 
@@ -238,13 +170,9 @@ async function loadNews() {
     setLoading(true, "Загружаем новости…");
 
     try {
-        const file = await githubRequest(
-            `/repos/${CONFIG.repo}/contents/${CONFIG.newsPath}?ref=${CONFIG.branch}`
-        );
-
-        state.newsSha = file.sha;
-        const decoded = JSON.parse(decodeBase64Utf8(file.content));
-        state.items = normalizeNewsData(decoded).sort((a, b) => {
+        const data = await apiRequest("/api/news");
+        state.newsSha = data.sha;
+        state.items = normalizeNewsData(data).sort((a, b) => {
             return Date.parse(b.isoDate || "") - Date.parse(a.isoDate || "");
         });
         state.view = "list";
@@ -252,40 +180,23 @@ async function loadNews() {
     } catch (error) {
         setLoading(false);
         showToast(error.message, true);
+        if (!state.token) {
+            render();
+        }
     }
 }
 
-function encodeBase64Utf8(text) {
-    return btoa(unescape(encodeURIComponent(text)));
-}
-
-function decodeBase64Utf8(base64) {
-    return decodeURIComponent(
-        Array.from(atob(base64.replace(/\n/g, "")), (char) => {
-            return `%${`00${char.charCodeAt(0).toString(16)}`.slice(-2)}`;
-        }).join("")
-    );
-}
-
-async function saveNewsToGitHub(message) {
-    const payload = {
-        items: state.items
-    };
-
-    const body = {
-        message,
-        content: encodeBase64Utf8(`${JSON.stringify(payload, null, 2)}\n`),
-        branch: CONFIG.branch,
-        sha: state.newsSha
-    };
-
-    const file = await githubRequest(`/repos/${CONFIG.repo}/contents/${CONFIG.newsPath}`, {
+async function saveNews(message) {
+    const data = await apiRequest("/api/news", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
+        body: JSON.stringify({
+            items: state.items,
+            sha: state.newsSha,
+            message
+        })
     });
 
-    state.newsSha = file.content.sha;
+    state.newsSha = data.sha;
 }
 
 async function uploadImageIfNeeded() {
@@ -295,8 +206,6 @@ async function uploadImageIfNeeded() {
 
     const file = state.pendingImage;
     const extension = file.name.split(".").pop().toLowerCase() || "jpg";
-    const safeName = `news-${Date.now()}.${extension}`;
-    const path = `${CONFIG.imagesPath}/${safeName}`;
 
     const base64 = await new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -305,17 +214,15 @@ async function uploadImageIfNeeded() {
         reader.readAsDataURL(file);
     });
 
-    await githubRequest(`/repos/${CONFIG.repo}/contents/${path}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+    const data = await apiRequest("/api/upload", {
+        method: "POST",
         body: JSON.stringify({
-            message: `Upload news image ${safeName}`,
             content: base64,
-            branch: CONFIG.branch
+            extension
         })
     });
 
-    return path;
+    return data.path;
 }
 
 async function handleSaveDraft() {
@@ -341,7 +248,7 @@ async function handleSaveDraft() {
             state.items.unshift(item);
         }
 
-        await saveNewsToGitHub(
+        await saveNews(
             state.editingIndex >= 0 ? "Update news via IPL admin" : "Add news via IPL admin"
         );
 
@@ -371,7 +278,7 @@ async function handleDelete(index) {
     try {
         setLoading(true, "Удаляем новость…");
         state.items.splice(index, 1);
-        await saveNewsToGitHub("Delete news via IPL admin");
+        await saveNews("Delete news via IPL admin");
         setLoading(false);
         showToast("Новость удалена");
     } catch (error) {
@@ -428,15 +335,24 @@ function renderLogin() {
     return `
         ${renderHeader()}
         <div class="login-wrap">
-            <div class="login-card">
+            <form class="login-card" data-form="login">
                 <div class="login-badge">ИПЛ</div>
                 <h1>Вход в админку</h1>
-                <p>Для публикации новостей войдите через GitHub. Доступ есть только у редакторов репозитория.</p>
-                <button class="btn btn-brand btn-icon btn-github" type="button" data-action="login" ${state.loading ? "disabled" : ""}>
-                    Войти через GitHub
+                <p>Введите логин и пароль редактора для публикации новостей.</p>
+                <div class="field">
+                    <label for="loginUsername">Логин</label>
+                    <input id="loginUsername" name="loginUsername" type="text" autocomplete="username" value="${escapeHtml(state.loginUsername)}" required ${state.loading ? "disabled" : ""}>
+                </div>
+                <div class="field">
+                    <label for="loginPassword">Пароль</label>
+                    <input id="loginPassword" name="loginPassword" type="password" autocomplete="current-password" value="${escapeHtml(state.loginPassword)}" required ${state.loading ? "disabled" : ""}>
+                </div>
+                ${state.message ? `<div class="status-bar">${escapeHtml(state.message)}</div>` : ""}
+                <button class="btn btn-brand" type="submit" ${state.loading ? "disabled" : ""}>
+                    Войти
                 </button>
-                <p class="login-note">Нужны права редактора в репозитории GitHub</p>
-            </div>
+                <p class="login-note">Доступ только для сотрудников с паролем</p>
+            </form>
         </div>
     `;
 }
@@ -543,6 +459,14 @@ function render() {
 }
 
 function bindEvents() {
+    app.addEventListener("submit", (event) => {
+        const form = event.target.closest("[data-form='login']");
+        if (!form || state.loading) {
+            return;
+        }
+        handleLogin(event);
+    });
+
     app.addEventListener("click", (event) => {
         const button = event.target.closest("[data-action]");
         if (!button || state.loading) {
@@ -552,9 +476,7 @@ function bindEvents() {
         const action = button.dataset.action;
         const index = Number.parseInt(button.dataset.index || "", 10);
 
-        if (action === "login") {
-            handleLogin();
-        } else if (action === "logout") {
+        if (action === "logout") {
             handleLogout();
         } else if (action === "create") {
             openCreate();
@@ -576,6 +498,16 @@ function bindEvents() {
     app.addEventListener("input", (event) => {
         const target = event.target;
         if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) {
+            return;
+        }
+
+        if (target.name === "loginUsername") {
+            state.loginUsername = target.value;
+            return;
+        }
+
+        if (target.name === "loginPassword") {
+            state.loginPassword = target.value;
             return;
         }
 
