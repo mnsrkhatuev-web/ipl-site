@@ -1,4 +1,4 @@
-const CACHE_VERSION = "ipl-site-v2";
+const CACHE_VERSION = "ipl-site-v3";
 const PRECACHE_URLS = [
   "/",
   "/index.html",
@@ -46,6 +46,15 @@ function isNavigationRequest(request) {
   );
 }
 
+function isFreshAsset(pathname) {
+  return (
+    pathname.endsWith(".js") ||
+    pathname.endsWith(".css") ||
+    pathname.endsWith(".json") ||
+    pathname.endsWith(".webmanifest")
+  );
+}
+
 self.addEventListener("fetch", (event) => {
   const { request } = event;
 
@@ -58,12 +67,14 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (isNavigationRequest(request)) {
+  if (isNavigationRequest(request) || isFreshAsset(url.pathname)) {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_VERSION).then((cache) => cache.put(request, copy));
+          if (response && response.status === 200 && response.type === "basic") {
+            const copy = response.clone();
+            caches.open(CACHE_VERSION).then((cache) => cache.put(request, copy));
+          }
           return response;
         })
         .catch(() => caches.match(request).then((cached) => cached || caches.match("/index.html")))

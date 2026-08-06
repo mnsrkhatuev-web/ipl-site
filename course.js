@@ -93,6 +93,24 @@ function createCourseApp(root, course) {
     let progress = loadCourseProgress();
     let view = { type: "hub" };
     let quizState = null;
+    const now = new Date();
+    let calendarYear = now.getFullYear();
+    let calendarMonth = now.getMonth(); // 0-11
+
+    const MONTH_NAMES = [
+        "Январь",
+        "Февраль",
+        "Март",
+        "Апрель",
+        "Май",
+        "Июнь",
+        "Июль",
+        "Август",
+        "Сентябрь",
+        "Октябрь",
+        "Ноябрь",
+        "Декабрь"
+    ];
 
     function setProgress(next) {
         progress = next;
@@ -395,6 +413,105 @@ function createCourseApp(root, course) {
         `;
     }
 
+    function monthKey(year, month, day) {
+        const mm = String(month + 1).padStart(2, "0");
+        const dd = String(day).padStart(2, "0");
+        return `${year}-${mm}-${dd}`;
+    }
+
+    function daysInMonth(year, month) {
+        return new Date(year, month + 1, 0).getDate();
+    }
+
+    function availableYears() {
+        const years = new Set([now.getFullYear()]);
+        Object.keys(progress.days || {}).forEach((key) => {
+            const year = Number(String(key).slice(0, 4));
+            if (Number.isFinite(year) && year >= 2020 && year <= now.getFullYear() + 1) {
+                years.add(year);
+            }
+        });
+        return Array.from(years).sort((a, b) => b - a);
+    }
+
+    function shiftCalendar(deltaMonths) {
+        const cursor = new Date(calendarYear, calendarMonth + deltaMonths, 1);
+        calendarYear = cursor.getFullYear();
+        calendarMonth = cursor.getMonth();
+        render();
+    }
+
+    function renderMonthHistory() {
+        const totalDays = daysInMonth(calendarYear, calendarMonth);
+        const years = availableYears();
+        if (!years.includes(calendarYear)) {
+            years.push(calendarYear);
+            years.sort((a, b) => b - a);
+        }
+        const today = todayKey();
+        let activeDays = 0;
+        let monthBest = 0;
+
+        const dayCells = Array.from({ length: totalDays }, (_, index) => {
+            const day = index + 1;
+            const key = monthKey(calendarYear, calendarMonth, day);
+            const stats = progress.days[key];
+            const best = Number(stats?.bestPercent) || 0;
+            if (best > 0) {
+                activeDays += 1;
+                monthBest = Math.max(monthBest, best);
+            }
+            const height = best > 0 ? Math.max(10, best) : 0;
+            return `
+                <div class="course-cal-day ${key === today ? "is-today" : ""} ${best ? "has-score" : ""}" title="${best ? `${best}%` : "нет попыток"}">
+                    <span class="course-cal-num">${day}</span>
+                    <span class="course-cal-bar-wrap">
+                        ${best ? `<span class="course-cal-bar" style="height:${height}%"></span>` : ""}
+                    </span>
+                    <strong>${best ? `${best}%` : "·"}</strong>
+                </div>
+            `;
+        }).join("");
+
+        return `
+            <div class="course-month-history">
+                <div class="course-module-progress-head">
+                    <h3>История по дням</h3>
+                    <p class="muted">Выберите месяц и год. Высота — лучший % за день</p>
+                </div>
+                <div class="course-cal-controls">
+                    <button type="button" class="btn course-cal-nav" data-course-action="cal-prev" aria-label="Предыдущий месяц">←</button>
+                    <label class="course-cal-select">
+                        <span class="visually-hidden">Месяц</span>
+                        <select data-course-action="cal-month">
+                            ${MONTH_NAMES.map(
+                                (name, index) =>
+                                    `<option value="${index}" ${index === calendarMonth ? "selected" : ""}>${name}</option>`
+                            ).join("")}
+                        </select>
+                    </label>
+                    <label class="course-cal-select">
+                        <span class="visually-hidden">Год</span>
+                        <select data-course-action="cal-year">
+                            ${years
+                                .map(
+                                    (year) =>
+                                        `<option value="${year}" ${year === calendarYear ? "selected" : ""}>${year}</option>`
+                                )
+                                .join("")}
+                        </select>
+                    </label>
+                    <button type="button" class="btn course-cal-nav" data-course-action="cal-next" aria-label="Следующий месяц">→</button>
+                </div>
+                <p class="muted course-cal-summary">
+                    ${MONTH_NAMES[calendarMonth]} ${calendarYear}:
+                    ${activeDays ? `${activeDays} дн. · лучший ${monthBest}%` : "пока нет попыток"}
+                </p>
+                <div class="course-cal-grid">${dayCells}</div>
+            </div>
+        `;
+    }
+
     function renderStatsStrip() {
         const done = completedCount();
         const moduleBests = course.modules
@@ -459,6 +576,7 @@ function createCourseApp(root, course) {
                         ${progress.examPassed ? `<p class="course-badge">Финальный экзамен сдан</p>` : ""}
                         ${renderStatsStrip()}
                         ${renderModuleProgress()}
+                        ${renderMonthHistory()}
                         ${renderAbbreviations()}
                         <button type="button" class="btn course-reset" data-course-action="reset">Сбросить прогресс</button>
                     </div>
@@ -843,7 +961,7 @@ function createCourseApp(root, course) {
 
     root.addEventListener("click", (event) => {
         const trigger = event.target.closest("[data-course-action]");
-        if (!trigger) {
+        if (!trigger || trigger.tagName === "SELECT" || trigger.tagName === "OPTION") {
             return;
         }
 
@@ -858,6 +976,16 @@ function createCourseApp(root, course) {
             if (window.confirm("Сбросить весь прогресс курса, экзамен и ошибки?")) {
                 resetProgress();
             }
+            return;
+        }
+
+        if (action === "cal-prev") {
+            shiftCalendar(-1);
+            return;
+        }
+
+        if (action === "cal-next") {
+            shiftCalendar(1);
             return;
         }
 
@@ -893,6 +1021,23 @@ function createCourseApp(root, course) {
 
         if (action === "next-question") {
             nextQuestion();
+        }
+    });
+
+    root.addEventListener("change", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLSelectElement)) {
+            return;
+        }
+        const action = target.dataset.courseAction;
+        if (action === "cal-month") {
+            calendarMonth = Number(target.value) || 0;
+            render();
+            return;
+        }
+        if (action === "cal-year") {
+            calendarYear = Number(target.value) || now.getFullYear();
+            render();
         }
     });
 
