@@ -325,14 +325,21 @@ function renderHeader() {
     return `
         <header class="admin-header">
             <div class="admin-header-inner">
-                <a class="admin-logo" href="${CONFIG.siteUrl}/">
+                <a class="admin-logo" href="./">
                     <div class="admin-logo-mark">ИПЛ</div>
                     <div class="admin-logo-text">
-                        Админка новостей
+                        Админка
                         <span>ФГБУ СЭУ ФПС ИПЛ по ЧР</span>
                     </div>
                 </a>
-                ${state.token ? `<button class="btn btn-ghost" type="button" data-action="logout">Выйти</button>` : ""}
+                ${
+                    state.token
+                        ? `<div class="admin-header-actions">
+                            <a class="btn btn-ghost" href="course.html">Обучение</a>
+                            <button class="btn btn-ghost" type="button" data-action="logout">Выйти</button>
+                           </div>`
+                        : ""
+                }
             </div>
         </header>
     `;
@@ -399,6 +406,7 @@ function renderNewsList() {
             ${state.message ? `<div class="status-bar">${escapeHtml(state.message)}</div>` : ""}
             <div class="admin-actions">
                 <button class="btn btn-primary" type="button" data-action="create" ${state.loading ? "disabled" : ""}>+ Добавить новость</button>
+                <a class="btn btn-secondary" href="course.html">Обучение</a>
                 <a class="btn btn-ghost" href="${CONFIG.siteUrl}/pages/news.html" target="_blank" rel="noopener">Открыть сайт</a>
             </div>
             <div class="news-list">${cards}</div>

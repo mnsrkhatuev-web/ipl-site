@@ -128,6 +128,40 @@ button:disabled {
     font-weight: 600;
 }
 
+.admin-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.admin-course-page .page-header,
+.admin-course-page .page-content {
+    padding-top: 36px;
+    padding-bottom: 36px;
+}
+
+.admin-course-page .page-header-image::before {
+    display: none;
+}
+
+.admin-course-page .page-header-image .section-kicker,
+.admin-course-page .page-header-image h1,
+.admin-course-page .page-header-image .section-text,
+.admin-course-page .page-header .section-kicker,
+.admin-course-page .page-header h1,
+.admin-course-page .page-header .section-text {
+    color: inherit;
+}
+
+.admin-course-page .page-header h1 {
+    color: var(--brand-strong);
+}
+
+.admin-course-page .section-kicker {
+    color: var(--accent);
+}
+
 /* Layout */
 
 .admin-main {

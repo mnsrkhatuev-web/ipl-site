@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru" translate="no">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="google" content="notranslate">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta name="theme-color" content="#0f2741">
+    <title>Обучение — админка ИПЛ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="admin.css?v=4">
+    <script>
+        if (!sessionStorage.getItem("ipl_admin_token")) {
+            location.replace("./");
+        }
+    </script>
+</head>
+<body class="notranslate admin-course-page" data-admin-course="1">
+    <header class="admin-header">
+        <div class="admin-header-inner">
+            <a class="admin-logo" href="./">
+                <div class="admin-logo-mark">ИПЛ</div>
+                <div class="admin-logo-text">
+                    Обучение
+                    <span>Только для сотрудников</span>
+                </div>
+            </a>
+            <div class="admin-header-actions">
+                <a class="btn btn-ghost" href="./">К новостям</a>
+                <button class="btn btn-ghost" type="button" id="course-logout">Выйти</button>
+            </div>
+        </div>
+    </header>
+
+    <main id="course-app">
+        <section class="page-content">
+            <div class="container">
+                <article class="card">
+                    <h3>Загрузка курса…</h3>
+                    <p>Подготавливаем учебные модули.</p>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <script src="../script.js"></script>
+    <script src="../course.js"></script>
+    <script>
+        document.getElementById("course-logout")?.addEventListener("click", () => {
+            sessionStorage.removeItem("ipl_admin_token");
+            location.replace("./");
+        });
+    </script>
+</body>
+</html>

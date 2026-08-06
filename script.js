@@ -17,8 +17,9 @@ function resolvePath(relativePath) {
         return relativePath;
     }
 
-    const inPagesDir = window.location.pathname.includes("/pages/");
-    return inPagesDir ? `../${relativePath}` : relativePath;
+    const path = window.location.pathname;
+    const inNestedDir = path.includes("/pages/") || path.includes("/admin/");
+    return inNestedDir ? `../${relativePath}` : relativePath;
 }
 
 function normalizeNewsItems(data) {
