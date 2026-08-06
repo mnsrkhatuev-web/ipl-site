@@ -1335,9 +1335,15 @@ h3 {
 
 .course-stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
     margin: 22px 0 8px;
+}
+
+@media (min-width: 761px) {
+    .course-stats-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
 }
 
 .course-stat {
@@ -1361,6 +1367,74 @@ h3 {
     font-size: 1.35rem;
     color: var(--brand-strong);
     line-height: 1.1;
+}
+
+.course-module-progress {
+    margin: 22px 0 8px;
+    padding: 18px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--line);
+    background: rgba(23, 59, 99, 0.03);
+}
+
+.course-module-progress-head {
+    display: grid;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.course-module-progress-head h3 {
+    font-size: 1.05rem;
+    color: var(--brand-strong);
+}
+
+.course-module-progress-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+}
+
+.course-module-progress-item {
+    display: grid;
+    gap: 8px;
+}
+
+.course-module-progress-item.is-locked {
+    opacity: 0.62;
+}
+
+.course-module-progress-item.is-done .course-progress-fill {
+    background: linear-gradient(135deg, #2e7d46, #1f5a32);
+}
+
+.course-module-progress-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.course-module-progress-row span {
+    font-weight: 700;
+    color: var(--text);
+    min-width: 0;
+}
+
+.course-module-progress-row strong {
+    flex-shrink: 0;
+    font-size: 1.05rem;
+    color: var(--brand-strong);
+}
+
+.course-module-progress-item .course-progress-track {
+    margin-bottom: 0;
+    height: 8px;
+}
+
+.course-module-progress-item .muted {
+    font-size: 0.86rem;
 }
 
 .course-days {
@@ -1460,7 +1534,9 @@ h3 {
 
 
 html[data-theme="dark"] .course-devices,
-html[data-theme="dark"] .course-abbr-block {
+html[data-theme="dark"] .course-abbr-block,
+html[data-theme="dark"] .course-module-progress,
+html[data-theme="dark"] .course-stat {
     background: rgba(255, 255, 255, 0.04);
 }
 

@@ -352,59 +352,71 @@ function createCourseApp(root, course) {
         goHub();
     }
 
-    function renderDayChart() {
-        const days = lastDays(7);
-        const maxBest = Math.max(1, ...days.map((day) => progress.days[day]?.bestPercent || 0));
-
+    function renderModuleProgress() {
         return `
-            <div class="course-days">
-                <div class="course-days-head">
-                    <h3>Прогресс по дням</h3>
-                    <p class="muted">Лучший результат за последние 7 дней</p>
+            <div class="course-module-progress">
+                <div class="course-module-progress-head">
+                    <h3>Результаты по модулям</h3>
+                    <p class="muted">Показывается лучший процент каждого модуля</p>
                 </div>
-                <div class="course-days-chart" role="img" aria-label="Диаграмма прогресса по дням">
-                    ${days
-                        .map((day) => {
-                            const stats = progress.days[day];
-                            const best = stats?.bestPercent || 0;
-                            const height = Math.max(8, Math.round((best / maxBest) * 100));
-                            const isToday = day === todayKey();
+                <ul class="course-module-progress-list">
+                    ${course.modules
+                        .map((module, index) => {
+                            const unlocked = isModuleUnlocked(course.modules, index, progress);
+                            const completed = Boolean(progress.completed[module.id]);
+                            const best = progress.best[module.id];
+                            const percent = Number(best?.percent) || 0;
+                            const barWidth = unlocked ? Math.min(100, Math.max(0, percent)) : 0;
+                            let status = "Не начат";
+                            if (!unlocked) {
+                                status = "Закрыт";
+                            } else if (completed) {
+                                status = `Сдан · ${percent}%`;
+                            } else if (best) {
+                                status = `Не сдан · лучший ${percent}%`;
+                            }
+
                             return `
-                                <div class="course-day-col ${isToday ? "is-today" : ""}">
-                                    <div class="course-day-bar-wrap">
-                                        <span class="course-day-bar" style="height:${height}%"></span>
+                                <li class="course-module-progress-item ${completed ? "is-done" : ""} ${unlocked ? "" : "is-locked"}">
+                                    <div class="course-module-progress-row">
+                                        <span>${index + 1}. ${escapeHtml(module.title)}</span>
+                                        <strong>${unlocked ? (best ? `${percent}%` : "—") : "—"}</strong>
                                     </div>
-                                    <strong>${best ? `${best}%` : "—"}</strong>
-                                    <span>${formatDayLabel(day)}</span>
-                                </div>
+                                    <div class="course-progress-track" aria-hidden="true">
+                                        <span class="course-progress-fill" style="width:${barWidth}%"></span>
+                                    </div>
+                                    <p class="muted">${status}</p>
+                                </li>
                             `;
                         })
                         .join("")}
-                </div>
+                </ul>
             </div>
         `;
     }
 
     function renderStatsStrip() {
-        const today = progress.days[todayKey()];
-        const bestOverall = Object.values(progress.best).reduce(
-            (max, item) => Math.max(max, item?.percent || 0),
-            0
-        );
+        const done = completedCount();
+        const moduleBests = course.modules
+            .map((module) => progress.best[module.id]?.percent)
+            .filter((value) => Number.isFinite(value));
+        const avgBest = moduleBests.length
+            ? Math.round(moduleBests.reduce((sum, value) => sum + value, 0) / moduleBests.length)
+            : null;
         const examBest = progress.best[examConfig?.id || "exam"]?.percent;
         const mistakesCount = mistakeEntries().length;
 
         return `
             <div class="course-stats-grid">
                 <div class="course-stat">
-                    <span class="course-stat-label">Сегодня</span>
-                    <strong>${today ? `${today.bestPercent}%` : "—"}</strong>
-                    <span class="muted">${today ? `${today.attempts} попыт.` : "ещё не начинали"}</span>
+                    <span class="course-stat-label">Модули</span>
+                    <strong>${done}/${course.modules.length}</strong>
+                    <span class="muted">${done ? "сдано" : "ещё не сдавали"}</span>
                 </div>
                 <div class="course-stat">
-                    <span class="course-stat-label">Лучший результат</span>
-                    <strong>${bestOverall ? `${bestOverall}%` : "—"}</strong>
-                    <span class="muted">по всем тестам</span>
+                    <span class="course-stat-label">Средний лучший</span>
+                    <strong>${avgBest != null ? `${avgBest}%` : "—"}</strong>
+                    <span class="muted">по пройденным тестам</span>
                 </div>
                 <div class="course-stat">
                     <span class="course-stat-label">Экзамен</span>
@@ -446,7 +458,7 @@ function createCourseApp(root, course) {
                         <p class="muted">Зачёт модуля — от ${passPercent}%. Экзамен — от ${examPassPercent}% после всех модулей.</p>
                         ${progress.examPassed ? `<p class="course-badge">Финальный экзамен сдан</p>` : ""}
                         ${renderStatsStrip()}
-                        ${renderDayChart()}
+                        ${renderModuleProgress()}
                         ${renderAbbreviations()}
                         <button type="button" class="btn course-reset" data-course-action="reset">Сбросить прогресс</button>
                     </div>
