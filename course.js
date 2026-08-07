@@ -574,9 +574,17 @@ function createCourseApp(root, course) {
                         </div>
                         <p class="muted">Зачёт модуля — от ${passPercent}%. Экзамен — от ${examPassPercent}% после всех модулей.</p>
                         ${progress.examPassed ? `<p class="course-badge">Финальный экзамен сдан</p>` : ""}
-                        ${renderStatsStrip()}
-                        ${renderModuleProgress()}
-                        ${renderMonthHistory()}
+                        <details class="course-progress-panel">
+                            <summary class="course-progress-summary">
+                                <span>Подробный прогресс</span>
+                                <span class="course-progress-summary-hint">модули и календарь</span>
+                            </summary>
+                            <div class="course-progress-panel-body">
+                                ${renderStatsStrip()}
+                                ${renderModuleProgress()}
+                                ${renderMonthHistory()}
+                            </div>
+                        </details>
                         ${renderAbbreviations()}
                         <button type="button" class="btn course-reset" data-course-action="reset">Сбросить прогресс</button>
                     </div>

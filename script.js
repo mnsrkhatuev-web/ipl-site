@@ -553,7 +553,7 @@ function applyTheme(theme) {
         button.title = next === "dark" ? "Светлая тема" : "Тёмная тема";
         const label = button.querySelector(".theme-toggle-label");
         if (label) {
-            label.textContent = next === "dark" ? "Светлая" : "Тёмная";
+            label.textContent = "Тема";
         }
     });
 }

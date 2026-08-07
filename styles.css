@@ -23,22 +23,22 @@
 }
 
 html[data-theme="dark"] {
-    --bg: #121820;
-    --bg-top: #151c26;
-    --bg-mid: #121820;
-    --bg-bottom: #0e131a;
-    --surface: rgba(28, 36, 48, 0.88);
-    --surface-strong: #1c2430;
-    --line: rgba(220, 230, 245, 0.12);
-    --text: #e8edf5;
-    --muted: #9aa6b8;
-    --brand: #7eb0e0;
-    --brand-strong: #d7e6f7;
-    --accent: #d4a85a;
-    --accent-soft: #8a6a35;
-    --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
-    --header-bg: rgba(18, 24, 32, 0.9);
-    --toggle-bg: #243041;
+    --bg: #0f141b;
+    --bg-top: #121821;
+    --bg-mid: #0f141b;
+    --bg-bottom: #0b1016;
+    --surface: rgba(22, 28, 38, 0.92);
+    --surface-strong: #171e28;
+    --line: rgba(210, 222, 240, 0.1);
+    --text: #e6edf7;
+    --muted: #93a0b4;
+    --brand: #8eb6dc;
+    --brand-strong: #e8f0fa;
+    --accent: #c9a05a;
+    --accent-soft: #6f5630;
+    --shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+    --header-bg: rgba(15, 20, 27, 0.92);
+    --toggle-bg: transparent;
 }
 
 * {
@@ -178,23 +178,28 @@ img {
     min-height: 42px;
     padding: 0 14px;
     border: 1px solid var(--line);
-    border-radius: 12px;
-    background: var(--toggle-bg);
-    color: var(--brand-strong);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
     cursor: pointer;
     flex-shrink: 0;
     font-weight: 700;
     font-size: 0.88rem;
-    transition: transform 0.2s ease, background 0.2s ease;
+    transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
 .theme-toggle:hover {
-    transform: translateY(-1px);
+    color: var(--brand-strong);
+    background: rgba(23, 59, 99, 0.08);
+}
+
+html[data-theme="dark"] .theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.06);
 }
 
 .theme-toggle svg {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     fill: none;
     stroke: currentColor;
     stroke-width: 1.8;
@@ -221,8 +226,9 @@ html[data-theme="dark"] .theme-toggle .icon-sun {
 
 @media (max-width: 760px) {
     .theme-toggle {
-        width: 44px;
+        width: 42px;
         padding: 0;
+        border-radius: 12px;
     }
 
     .theme-toggle-label {
@@ -1355,13 +1361,67 @@ h3 {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
-    margin: 22px 0 8px;
+    margin: 0 0 8px;
 }
 
 @media (min-width: 761px) {
     .course-stats-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
+}
+
+.course-progress-panel {
+    margin: 20px 0 8px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: rgba(23, 59, 99, 0.03);
+    overflow: hidden;
+}
+
+.course-progress-summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    font-weight: 800;
+    color: var(--brand-strong);
+    user-select: none;
+}
+
+.course-progress-summary::-webkit-details-marker {
+    display: none;
+}
+
+.course-progress-summary::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.course-progress-panel[open] .course-progress-summary::after {
+    transform: rotate(-135deg);
+    margin-top: 4px;
+}
+
+.course-progress-summary-hint {
+    margin-left: auto;
+    margin-right: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.course-progress-panel-body {
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--line);
 }
 
 .course-stat {
@@ -1388,11 +1448,11 @@ h3 {
 }
 
 .course-module-progress {
-    margin: 22px 0 8px;
-    padding: 18px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--line);
-    background: rgba(23, 59, 99, 0.03);
+    margin: 18px 0 8px;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
 }
 
 .course-module-progress-head {
@@ -1456,11 +1516,11 @@ h3 {
 }
 
 .course-month-history {
-    margin: 22px 0 8px;
-    padding: 18px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--line);
-    background: rgba(23, 59, 99, 0.03);
+    margin: 18px 0 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
 }
 
 .course-cal-controls {
@@ -1681,10 +1741,14 @@ h3 {
 
 html[data-theme="dark"] .course-devices,
 html[data-theme="dark"] .course-abbr-block,
-html[data-theme="dark"] .course-module-progress,
-html[data-theme="dark"] .course-month-history,
+html[data-theme="dark"] .course-progress-panel,
 html[data-theme="dark"] .course-stat {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+html[data-theme="dark"] .course-module-progress,
+html[data-theme="dark"] .course-month-history {
+    background: transparent;
 }
 
 html[data-theme="dark"] .nav a:hover,

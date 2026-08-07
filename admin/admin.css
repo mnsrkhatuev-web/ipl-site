@@ -26,25 +26,25 @@
 }
 
 html[data-theme="dark"] {
-    --bg: #121820;
-    --bg-top: #151c26;
-    --bg-mid: #121820;
-    --bg-bottom: #0e131a;
-    --surface: #1c2430;
-    --surface-soft: rgba(28, 36, 48, 0.9);
-    --line: rgba(220, 230, 245, 0.12);
-    --text: #e8edf5;
-    --muted: #9aa6b8;
-    --brand: #7eb0e0;
-    --brand-strong: #d7e6f7;
-    --accent: #d4a85a;
-    --accent-soft: #8a6a35;
+    --bg: #0f141b;
+    --bg-top: #121821;
+    --bg-mid: #0f141b;
+    --bg-bottom: #0b1016;
+    --surface: #171e28;
+    --surface-soft: rgba(22, 28, 38, 0.92);
+    --line: rgba(210, 222, 240, 0.1);
+    --text: #e6edf7;
+    --muted: #93a0b4;
+    --brand: #8eb6dc;
+    --brand-strong: #e8f0fa;
+    --accent: #c9a05a;
+    --accent-soft: #6f5630;
     --danger: #f07167;
     --danger-soft: rgba(240, 113, 103, 0.14);
-    --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
-    --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.25);
-    --header-bg: rgba(18, 24, 32, 0.92);
-    --toggle-bg: #243041;
+    --shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.28);
+    --header-bg: rgba(15, 20, 27, 0.92);
+    --toggle-bg: transparent;
 }
 
 *,
@@ -783,13 +783,17 @@ button:disabled {
     min-height: 42px;
     padding: 0 14px;
     border: 1px solid var(--line);
-    border-radius: 12px;
-    background: var(--toggle-bg);
-    color: var(--brand-strong);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
     cursor: pointer;
     flex-shrink: 0;
     font-weight: 700;
     font-size: 0.88rem;
+}
+
+html[data-theme="dark"] .btn-ghost {
+    background: rgba(255, 255, 255, 0.04);
 }
 
 .theme-toggle svg {
