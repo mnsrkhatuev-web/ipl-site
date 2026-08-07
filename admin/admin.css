@@ -166,8 +166,40 @@ button:disabled {
 .admin-header-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     flex-shrink: 0;
+}
+
+.admin-course-page .admin-header-actions {
+    gap: 6px;
+}
+
+.admin-course-page .theme-toggle {
+    order: -1;
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    min-height: 42px;
+    padding: 0;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(160deg, var(--brand), var(--brand-strong));
+    color: #fff;
+}
+
+html[data-theme="dark"] .admin-course-page .theme-toggle {
+    background: linear-gradient(160deg, #3d6f9c, #1c3f63);
+    color: #fff;
+}
+
+.admin-course-page .theme-toggle .theme-toggle-label {
+    display: none;
+}
+
+.admin-course-page .theme-toggle svg {
+    width: 18px;
+    height: 18px;
+    stroke: #fff;
 }
 
 .admin-course-page .page-header,
@@ -712,6 +744,11 @@ button:disabled {
         width: min(100% - 24px, var(--container));
     }
 
+    .admin-header-inner {
+        gap: 10px;
+        min-height: 64px;
+    }
+
     .admin-main {
         padding-top: 24px;
         padding-bottom: 96px;
@@ -719,6 +756,24 @@ button:disabled {
 
     .admin-logo-text span {
         display: none;
+    }
+
+    .admin-course-page .admin-logo-text {
+        font-size: 0.9rem;
+    }
+
+    .admin-course-page .admin-header-actions .btn-ghost:not(.theme-toggle) {
+        min-height: 42px;
+        padding: 0 10px;
+        font-size: 0.78rem;
+        border-radius: 12px;
+    }
+
+    .admin-course-page .admin-header-actions a.btn-ghost {
+        max-width: 88px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .admin-actions .btn-primary[data-action="create"] {
@@ -766,6 +821,25 @@ button:disabled {
         min-height: 40px;
         padding: 0 14px;
         font-size: 0.88rem;
+    }
+
+    .theme-toggle {
+        width: 42px;
+        min-width: 42px;
+        height: 42px;
+        padding: 0;
+        border-radius: 12px;
+        background: linear-gradient(160deg, var(--brand), var(--brand-strong));
+        color: #fff;
+        border: none;
+    }
+
+    .theme-toggle-label {
+        display: none;
+    }
+
+    .theme-toggle svg {
+        stroke: #fff;
     }
 }
 
@@ -821,20 +895,4 @@ html[data-theme="dark"] .theme-toggle .icon-moon {
 
 html[data-theme="dark"] .theme-toggle .icon-sun {
     display: block;
-}
-
-@media (max-width: 760px) {
-    .theme-toggle {
-        width: 44px;
-        padding: 0;
-    }
-
-    .theme-toggle-label {
-        display: none;
-    }
-}
-
-html[data-theme="dark"] .course-devices,
-html[data-theme="dark"] .course-abbr-block {
-    background: rgba(255, 255, 255, 0.04);
 }

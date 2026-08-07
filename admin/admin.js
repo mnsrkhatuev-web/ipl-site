@@ -340,13 +340,13 @@ function renderHeader() {
                     </div>
                 </a>
                 <div class="admin-header-actions">
+                    ${themeButton}
                     ${
                         state.token
                             ? `<a class="btn btn-ghost" href="course.html">Обучение</a>
                                <button class="btn btn-ghost" type="button" data-action="logout">Выйти</button>`
                             : ""
                     }
-                    ${themeButton}
                 </div>
             </div>
         </header>

@@ -227,12 +227,21 @@ html[data-theme="dark"] .theme-toggle .icon-sun {
 @media (max-width: 760px) {
     .theme-toggle {
         width: 42px;
+        min-width: 42px;
+        height: 42px;
         padding: 0;
         border-radius: 12px;
+        background: linear-gradient(160deg, var(--brand), var(--brand-strong));
+        color: #fff;
+        border: none;
     }
 
     .theme-toggle-label {
         display: none;
+    }
+
+    .theme-toggle svg {
+        stroke: #fff;
     }
 }
 
